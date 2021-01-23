@@ -1,0 +1,7 @@
+lex.yy.c
+*.tab.c
+*.tab.h
+*.out
+core.*
+*.s
+*.mem
