@@ -1,5 +1,5 @@
 # How to Use :: make all N=filename
-all: 
+run: 
 	flex comp.l
 	bison -d comp.y
 	gcc comp.tab.c lex.yy.c ast.c -o comp.out -DYYERROR_VERBOSE -lfl -ly
@@ -19,7 +19,7 @@ test:
 	maps -e -q kadai2.s
 	maps -e -q kadai3.s
 
-compileg:
+rung:
 	flex -d comp.l
 	bison comp.y
 	gcc comp.tab.c lex.yy.c ast.c -o comp.out -DYYERROR_VERBOSE -lfl -ly -g
