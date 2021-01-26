@@ -1,4 +1,5 @@
 #include "ast.h"
+#define MEMORY 4
 /*
 命名規則：キャメルケース
 has, get, is, genを接頭辞に使う
@@ -12,6 +13,7 @@ int loops = 0;
 int branches = 0;
 int ifs = 0;
 
+int heap = 4;
 typedef enum
 {
   FALSE = 0,
@@ -127,11 +129,12 @@ int main(int argc, char *argv[])
   }
   else
   {
-    fprintf(stderr, "No Syntax Error.\n");
+    printf("No Syntax Error.\n");
     printf("===== printTree START =====\n");
     printTree(top);
     printf("===== printTree END =====\n");
     hasFileName(argc);
+
     FILE *fp;
     fp = fopen(strcat(argv[1], ".s"), "w");
     if (fp == NULL)
@@ -144,6 +147,7 @@ int main(int argc, char *argv[])
     settle(fp);
     fprintf(stderr, "DONE\n");
     fclose(fp);
+
     return 0;
   }
 }
@@ -235,7 +239,7 @@ void genCode(Node *n, FILE *fp)
     v->size = 1;
     variables[vars] = v;
     vars++;
-    offset = offset + (v->size * 4);
+    offset = offset + (v->size * MEMORY);
     printVars(vars);
   }
   else if (n->type == ASSIGNMENT_STMT_AST)
@@ -316,6 +320,57 @@ int isIdentNumber(Node *n)
     return FALSE;
   }
 }
+
+int expression_sub_heap(Node *n, FILE *fp, char *t, int heap_addr){
+  int h = heap_addr;
+    if (isOperator(n) == TRUE)
+    {
+      expression_sub(n, fp);
+    }
+    else if(isIdentNumber(n) == TRUE)
+    {
+      genCodeNumberOrIdent(n, t, fp);
+      fprintf(fp, "    sw $%s %d($t0)\n", t, offset + h);
+    }
+    else
+    {
+      expression_sub(n->child, fp);
+    }
+  return h;
+}
+
+void expression_sub(Node *n, FILE *fp){
+  if(isOperator(n) == TRUE){
+    int result = heap;
+    heap += MEMORY;
+
+    // left
+    int left_heap = expression_sub_heap(n->child, fp, "t1", heap);
+    heap += MEMORY;
+    // left
+
+    // right
+    int right_heap = expression_sub_heap(n->child->brother, fp, "t3", heap);
+    heap += MEMORY;
+    // right
+
+    // store
+    fprintf(fp, "    lw $t1, %d($t0)\n    nop\n", offset + left_heap);
+    fprintf(fp, "    lw $t3, %d($t0)\n    nop\n", offset + right_heap);
+
+    OP(n, fp);
+
+    fprintf(fp, "#after operator\n    sw $v0, %d($t0)\n    nop\n", offset + result);
+  }
+  else
+  {
+    if(n->child != NULL)
+    {
+      expression_sub(n->child, fp);
+    }
+  }
+}
+
 void expression(Node *n, FILE *fp)
 {
   printf("expression n :");
@@ -324,26 +379,8 @@ void expression(Node *n, FILE *fp)
   printNode(n->child);
   if (isOperator(n) == TRUE)
   {
-    if(isIdentNumber(n->child) == TRUE)
-    {
-      genCodeNumberOrIdent(n->child, "t1", fp);
-    }
-    else
-    {
-      expression(n->child, fp);
-      fprintf(fp, "    add $t1, $v0, $zero\n");
-    }
-
-    if(isIdentNumber(n->child->brother) == TRUE)
-    {
-      genCodeNumberOrIdent(n->child->brother, "t3", fp);
-    }
-    else
-    {
-      expression(n->child->brother, fp);
-      fprintf(fp, "    add $t3, $v0, $zero\n");
-    }
-    OP(n, fp);
+    expression_sub(n, fp);
+    heap = MEMORY;
   }
   else if (isIdentNumber(n) == TRUE)
   {
@@ -392,7 +429,7 @@ int getOffset(Node *n)
 void assignment(Node *n, FILE *fp)
 {
   int offset = getOffset(n->child);
-  fprintf(fp, "    sw $v0, %d($t0)\n", offset);
+  fprintf(fp, "#assign\n    sw $v0, %d($t0)\n", offset);
   fprintf(fp, "    nop\n");
   return ;
 }

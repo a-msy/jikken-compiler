@@ -35,9 +35,6 @@ decl_statement : DEFINE idents SEMIC { $$ = build_node1(DEFINE_AST, $2); }
 | ARRAY IDENT array_index SEMIC { $$ = build_node1(DEFINE_ARRAY_AST, build_array_node(ARRAY_AST, $2, $3)); }
 | function_dcl { $$ = build_node1(FUNCTION_DCL_AST, $1); }
 ;
-func_arg_decl_statement : DEFINE idents  { $$ = build_node1(DEFINE_AST, $2); }
-| ARRAY IDENT array_index { $$ = build_node1(DEFINE_ARRAY_AST, build_array_node(ARRAY_AST, $2, $3)); }
-;
 idents : IDENT COMMA idents { $$ = build_node2(IDENTS_AST, build_ident_node(IDENT_AST,$1), $3); }
 | IDENT { $$ = build_node1(IDENTS_AST, build_ident_node(IDENT_AST, $1)); }
 ;
@@ -64,9 +61,9 @@ expression : expression add_op term
 | expression crement
     { 
         if($2 == OP_INCRE){
-            $$ = build_node2(INCRE_AST, $1, $2); 
+            $$ = build_node1(INCRE_AST, $1); 
         }else{
-            $$ = build_node2(DECRE_AST, $1, $2);
+            $$ = build_node1(DECRE_AST, $1);
         }
     }
 | term
@@ -115,7 +112,7 @@ for_loop : FOR L_PARAN assignment_stmt condition SEMIC expression R_PARAN L_BRAC
 ;
 cond_stmt : if_stmt { $$ = build_node1(IF_AST, $1); }
 | if_stmt else_stmt { $$ = build_node2(IF_AST, $1, $2); }
-/* | IF L_PARAN condition R_PARAN statement { $$ = build_node2(IF_AST, $3, $5); } */
+| IF L_PARAN condition R_PARAN statement { $$ = build_node2(IF_AST, $3, $5); }
 ;
 if_stmt : IF L_PARAN condition R_PARAN L_BRACE statements R_BRACE { $$ = build_node2(IF_STMT_AST, $3, $6); }
 ;
@@ -149,6 +146,9 @@ argument_dcllist : decl_statement { $$ = build_node1(ARGUMENT_DCLLIST_AST, $1); 
 ;
 argument_calllist : expression COMMA argument_calllist { $$ = build_node2(ARGUMENT_CALLLIST_AST, $1, $3); }
 | expression { $$ = build_node1(ARGUMENT_CALLLIST_AST, $1); }
+;
+func_arg_decl_statement : DEFINE idents  { $$ = build_node1(DEFINE_AST, $2); }
+| ARRAY IDENT array_index { $$ = build_node1(DEFINE_ARRAY_AST, build_array_node(ARRAY_AST, $2, $3)); }
 ;
 function_dcl : FUNC IDENT L_PARAN argument_dcllist R_PARAN L_BRACE declarations statements R_BRACE { $$ = build_node4(FUNCTION_DCL_AST, build_ident_node(IDENT_AST, $2), $4, $7, $8); }
 ;

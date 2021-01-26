@@ -107,3 +107,5 @@ void condition(Node *n, FILE *fp);
 void branch(Node *n, FILE *fp, char *jump);
 void ifstmt(Node *n, FILE *fp);
 void elsestmt(Node *n, FILE *fp);
+void expression_sub(Node *n, FILE *fp);
+int expression_sub_heap(Node *n, FILE *fp, char *t, int heap_addr);

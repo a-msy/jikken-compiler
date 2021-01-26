@@ -1,4 +1,4 @@
-# How to Use :: make all N=filename
+# How to Use :: make all N=num
 run: 
 	flex comp.l
 	bison -d comp.y

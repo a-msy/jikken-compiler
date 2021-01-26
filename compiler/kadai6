@@ -1,12 +1,12 @@
-func quicksort(array a[], define l, define r){
+func quicksort(array a[i], define l, define r){
 define v, i, j, t;
 define ii;
 if (r > l){
 v = a[r]; i = l - 1; j = r;
 for(;;){
-while(a[++i] < v) ;
+while(a[++i] < v);
 while(a[--j] > v);
-if (i >= j) break;
+if (i >= j) { break; }
 t = a[i]; a[i] = a[j]; a[j] = t;
 }
 t = a[i]; a[i] = a[r]; a[r] = t;
