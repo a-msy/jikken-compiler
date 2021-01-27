@@ -15,6 +15,9 @@ test:
 	./comp.out kadai1 < kadai1
 	./comp.out kadai2 < kadai2
 	./comp.out kadai3 < kadai3
+	./comp.out kadai4 < kadai4 
+	./comp.out kadai5 < kadai5
+	./comp.out kadai6 < kadai6
 	maps -e -q kadai1.s
 	maps -e -q kadai2.s
 	maps -e -q kadai3.s

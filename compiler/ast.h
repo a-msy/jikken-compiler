@@ -51,6 +51,7 @@ typedef enum{
   LOOP_STMT_AST,
   COND_STMT_AST,
   DEFINE_ARRAY_AST,
+  ARGUMENT_DCL_AST,
   OP_EQ,
   OP_LT,
   OP_GT,

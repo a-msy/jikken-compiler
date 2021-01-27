@@ -1,4 +1,4 @@
-func quicksort(array a[i], define l, define r){
+func quicksort(array a[], define l, define r){
 define v, i, j, t;
 define ii;
 if (r > l){

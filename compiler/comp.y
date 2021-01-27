@@ -19,8 +19,8 @@ extern int yyerror();
 %token BREAK ADD SUB MUL DIV EQ LT GT LTE GLT INCRE DECRE
 %token <ival>NUMBER
 %token FUNC COMMA FUNCCALL
-%type <np> program declarations idents argument_calllist argument_dcllist function_call function_dcl
-%type <np> array_index decl_statement statement statements assignment_stmt func_arg_decl_statement
+%type <np> program declarations idents argument_calllist argument_dcllist function_call function_dcl argument_dcl
+%type <np> array_index decl_statement statement statements assignment_stmt
 %type <np> expression term factor var while_loop
 %type <np> for_loop loop_stmt if_stmt cond_stmt condition break_stmt else_stmt elif_stmt
 %type <ival> add_op mul_op crement cond_op
@@ -50,6 +50,9 @@ statement : assignment_stmt { $$ = build_node1(STATEMENT_AST, $1); }
 assignment_stmt : IDENT ASSIGN expression SEMIC { $$ = build_node2(ASSIGNMENT_STMT_AST, build_ident_node(IDENT_AST, $1), $3); }
 | IDENT array_index ASSIGN expression SEMIC { $$ = build_node2(ASSIGNMENT_STMT_AST, build_array_node(IDENT_AST, $1, $2), $4); }
 ;
+array_index : array_index L_BRACKET expression R_BRACKET { $$ = build_node2(ARRAY_INDEX_AST, $1, $3); }
+| L_BRACKET expression R_BRACKET { $$ = build_node1(ARRAY_INDEX_AST, $2); }
+;
 expression : expression add_op term
     { 
         if($2 == OP_ADD){
@@ -66,11 +69,15 @@ expression : expression add_op term
             $$ = build_node1(DECRE_AST, $1);
         }
     }
+| crement expression
+    { 
+        if($1 == OP_INCRE){
+            $$ = build_node1(INCRE_AST, $2); 
+        }else{
+            $$ = build_node1(DECRE_AST, $2);
+        }
+    }
 | term
-;
-array_index : array_index L_BRACKET expression R_BRACKET { $$ = build_node2(ARRAY_INDEX_AST, $1, $3); }
-| L_BRACKET expression R_BRACKET { $$ = build_node1(ARRAY_INDEX_AST, $2); }
-| L_BRACKET R_BRACKET { $$ = build_node1(ARRAY_INDEX_AST, 0); }
 ;
 term : term mul_op factor 
     { 
@@ -141,19 +148,21 @@ cond_op : EQ { $$ = OP_EQ; }
 | LTE { $$ = OP_LTE; }
 | GLT { $$ = OP_GLT; }
 ;
-argument_dcllist : decl_statement { $$ = build_node1(ARGUMENT_DCLLIST_AST, $1); }
-| argument_dcllist COMMA func_arg_decl_statement { $$ = build_node2(ARGUMENT_DCLLIST_AST, $1, $3); }
+argument_dcllist : argument_dcl COMMA argument_dcllist { $$ = build_node2(ARGUMENT_DCLLIST_AST, $1, $3); }
+| argument_dcl { $$ = build_node1(ARGUMENT_DCLLIST_AST, $1); }
+| { $$ = build_node1(ARGUMENT_DCLLIST_AST, 0); }
+;
+argument_dcl : DEFINE IDENT { $$ = build_node1(ARGUMENT_DCL_AST, build_ident_node(IDENT_AST, $2)); }
+| ARRAY IDENT L_BRACKET R_BRACKET { $$ = build_node1(ARGUMENT_DCL_AST, build_array_node(ARRAY_AST, $2, 0)); }
 ;
 argument_calllist : expression COMMA argument_calllist { $$ = build_node2(ARGUMENT_CALLLIST_AST, $1, $3); }
 | expression { $$ = build_node1(ARGUMENT_CALLLIST_AST, $1); }
-;
-func_arg_decl_statement : DEFINE idents  { $$ = build_node1(DEFINE_AST, $2); }
-| ARRAY IDENT array_index { $$ = build_node1(DEFINE_ARRAY_AST, build_array_node(ARRAY_AST, $2, $3)); }
+| { $$ = build_node1(ARGUMENT_CALLLIST_AST, 0); }
 ;
 function_dcl : FUNC IDENT L_PARAN argument_dcllist R_PARAN L_BRACE declarations statements R_BRACE { $$ = build_node4(FUNCTION_DCL_AST, build_ident_node(IDENT_AST, $2), $4, $7, $8); }
 ;
 function_call : FUNCCALL IDENT L_PARAN argument_calllist R_PARAN SEMIC { $$ = build_node2(FUNCTION_CALL_AST, build_ident_node(IDENT_AST, $2), $4); }
 ;
-break_stmt : BREAK SEMIC  {$$ = build_node1(BREAK_AST, NULL);}
+break_stmt : BREAK SEMIC  {$$ = build_node1(BREAK_AST, 0);}
 ;
 %%

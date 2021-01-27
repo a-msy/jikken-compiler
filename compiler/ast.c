@@ -323,19 +323,19 @@ int isIdentNumber(Node *n)
 
 int expression_sub_heap(Node *n, FILE *fp, char *t, int heap_addr){
   int h = heap_addr;
-    if (isOperator(n) == TRUE)
-    {
-      expression_sub(n, fp);
-    }
-    else if(isIdentNumber(n) == TRUE)
-    {
-      genCodeNumberOrIdent(n, t, fp);
-      fprintf(fp, "    sw $%s %d($t0)\n", t, offset + h);
-    }
-    else
-    {
-      expression_sub(n->child, fp);
-    }
+  if (isOperator(n) == TRUE)
+  {
+    expression_sub(n, fp);
+  }
+  else if(isIdentNumber(n) == TRUE)
+  {
+    genCodeNumberOrIdent(n, t, fp);
+    fprintf(fp, "    sw $%s %d($t0)\n", t, offset + h);
+  }
+  else
+  {
+    expression_sub(n->child, fp);
+  }
   return h;
 }
 
