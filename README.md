@@ -1,7 +1,7 @@
 # jikken-compiler
 There is a viewing fee for this repository. Donate a pizza to me.
 
-## Supports syntax up to final exam 5
+## Supports syntax up to final exam 6
 ## Supports compilation up to final exam 3
 
 ## How to Use bro.
