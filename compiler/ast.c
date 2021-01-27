@@ -1,9 +1,5 @@
 #include "ast.h"
 #define MEMORY 4
-/*
-命名規則：キャメルケース
-has, get, is, genを接頭辞に使う
-*/
 Node *top; // 抽象構文木のルートノードを受け取るための変数
 Var *variables[64];
 char *typeChar[64];
@@ -151,6 +147,11 @@ int main(int argc, char *argv[])
     return 0;
   }
 }
+
+/*
+命名規則：キャメルケース
+has, get, is, genなどの動詞を接頭辞に使う
+*/
 
 void hasFileName(int arg)
 {
@@ -321,11 +322,11 @@ int isIdentNumber(Node *n)
   }
 }
 
-int expression_sub_heap(Node *n, FILE *fp, char *t, int heap_addr){
+int expressionSubHeap(Node *n, FILE *fp, char *t, int heap_addr){
   int h = heap_addr;
   if (isOperator(n) == TRUE)
   {
-    expression_sub(n, fp);
+    expressionSub(n, fp);
   }
   else if(isIdentNumber(n) == TRUE)
   {
@@ -334,29 +335,29 @@ int expression_sub_heap(Node *n, FILE *fp, char *t, int heap_addr){
   }
   else
   {
-    expression_sub(n->child, fp);
+    expressionSub(n->child, fp);
   }
   return h;
 }
 
-void expression_sub(Node *n, FILE *fp){
+void expressionSub(Node *n, FILE *fp){
   if(isOperator(n) == TRUE){
     int result = heap;
     heap += MEMORY;
 
     // left
-    int left_heap = expression_sub_heap(n->child, fp, "t1", heap);
+    int leftHeap = expressionSubHeap(n->child, fp, "t1", heap);
     heap += MEMORY;
     // left
 
     // right
-    int right_heap = expression_sub_heap(n->child->brother, fp, "t3", heap);
+    int rightHeap = expressionSubHeap(n->child->brother, fp, "t3", heap);
     heap += MEMORY;
     // right
 
     // store
-    fprintf(fp, "    lw $t1, %d($t0)\n    nop\n", offset + left_heap);
-    fprintf(fp, "    lw $t3, %d($t0)\n    nop\n", offset + right_heap);
+    fprintf(fp, "    lw $t1, %d($t0)\n    nop\n", offset + leftHeap);
+    fprintf(fp, "    lw $t3, %d($t0)\n    nop\n", offset + rightHeap);
 
     OP(n, fp);
 
@@ -366,7 +367,7 @@ void expression_sub(Node *n, FILE *fp){
   {
     if(n->child != NULL)
     {
-      expression_sub(n->child, fp);
+      expressionSub(n->child, fp);
     }
   }
 }
@@ -379,7 +380,7 @@ void expression(Node *n, FILE *fp)
   printNode(n->child);
   if (isOperator(n) == TRUE)
   {
-    expression_sub(n, fp);
+    expressionSub(n, fp);
     heap = MEMORY;
   }
   else if (isIdentNumber(n) == TRUE)

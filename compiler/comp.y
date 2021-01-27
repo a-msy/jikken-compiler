@@ -52,6 +52,7 @@ assignment_stmt : IDENT ASSIGN expression SEMIC { $$ = build_node2(ASSIGNMENT_ST
 ;
 array_index : array_index L_BRACKET expression R_BRACKET { $$ = build_node2(ARRAY_INDEX_AST, $1, $3); }
 | L_BRACKET expression R_BRACKET { $$ = build_node1(ARRAY_INDEX_AST, $2); }
+| L_BRACKET R_BRACKET{ $$ = build_node1(ARRAY_INDEX_AST, 0); }
 ;
 expression : expression add_op term
     { 
@@ -123,10 +124,10 @@ cond_stmt : if_stmt { $$ = build_node1(IF_AST, $1); }
 ;
 if_stmt : IF L_PARAN condition R_PARAN L_BRACE statements R_BRACE { $$ = build_node2(IF_STMT_AST, $3, $6); }
 ;
-elif_stmt : ELSE if_stmt { $$ = build_node1(ELIF_STMT_AST, $2); };
-;
 else_stmt : elif_stmt else_stmt { $$ = build_node2(ELSE_STMT_AST, $1, $2); };
 | ELSE L_BRACE statements R_BRACE { $$ = build_node1(ELSE_STMT_AST, $3); }
+;
+elif_stmt : ELSE if_stmt { $$ = build_node1(ELIF_STMT_AST, $2); };
 ;
 condition : expression cond_op expression {
     if($2 == OP_EQ){
@@ -148,20 +149,20 @@ cond_op : EQ { $$ = OP_EQ; }
 | LTE { $$ = OP_LTE; }
 | GLT { $$ = OP_GLT; }
 ;
+function_dcl : FUNC IDENT L_PARAN argument_dcllist R_PARAN L_BRACE declarations statements R_BRACE { $$ = build_node4(FUNCTION_DCL_AST, build_ident_node(IDENT_AST, $2), $4, $7, $8); }
+;
 argument_dcllist : argument_dcl COMMA argument_dcllist { $$ = build_node2(ARGUMENT_DCLLIST_AST, $1, $3); }
 | argument_dcl { $$ = build_node1(ARGUMENT_DCLLIST_AST, $1); }
 | { $$ = build_node1(ARGUMENT_DCLLIST_AST, 0); }
 ;
 argument_dcl : DEFINE IDENT { $$ = build_node1(ARGUMENT_DCL_AST, build_ident_node(IDENT_AST, $2)); }
-| ARRAY IDENT L_BRACKET R_BRACKET { $$ = build_node1(ARGUMENT_DCL_AST, build_array_node(ARRAY_AST, $2, 0)); }
+| ARRAY IDENT array_index { $$ = build_node1(ARGUMENT_DCL_AST, build_array_node(ARRAY_AST, $2, 0)); }
+;
+function_call : FUNCCALL IDENT L_PARAN argument_calllist R_PARAN SEMIC { $$ = build_node2(FUNCTION_CALL_AST, build_ident_node(IDENT_AST, $2), $4); }
 ;
 argument_calllist : expression COMMA argument_calllist { $$ = build_node2(ARGUMENT_CALLLIST_AST, $1, $3); }
 | expression { $$ = build_node1(ARGUMENT_CALLLIST_AST, $1); }
 | { $$ = build_node1(ARGUMENT_CALLLIST_AST, 0); }
-;
-function_dcl : FUNC IDENT L_PARAN argument_dcllist R_PARAN L_BRACE declarations statements R_BRACE { $$ = build_node4(FUNCTION_DCL_AST, build_ident_node(IDENT_AST, $2), $4, $7, $8); }
-;
-function_call : FUNCCALL IDENT L_PARAN argument_calllist R_PARAN SEMIC { $$ = build_node2(FUNCTION_CALL_AST, build_ident_node(IDENT_AST, $2), $4); }
 ;
 break_stmt : BREAK SEMIC  {$$ = build_node1(BREAK_AST, 0);}
 ;
