@@ -3,6 +3,10 @@ run:
 	make compile
 	./comp.out kadai${N} < kadai${N}
 
+maps:
+	make run N=${N}
+	maps -e -q kadai${N}.s
+	
 compile:
 	flex -d comp.l
 	bison -d comp.y
