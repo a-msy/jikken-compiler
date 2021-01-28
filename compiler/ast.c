@@ -462,11 +462,12 @@ void assignment(Node *n, FILE *fp)
 
 int isCondOperator(Node *n)
 {
+  printf("condType:%s\n", typeChar[n->type]);
   if (n == NULL)
   {
     return FALSE;
   }
-  else if (n->type == EQ_AST || n->type == LT_AST || n->type == LTE_AST || n->type == GLT_AST || n->type == GLT_AST)
+  else if (n->type == EQ_AST || n->type == LT_AST || n->type == LTE_AST || n->type == GT_AST || n->type == GLT_AST)
   {
     return TRUE;
   }
@@ -484,11 +485,12 @@ void condition(Node *n, FILE *fp)
   printNode(n->child);
   printf("condition:n->child->brother ");
   printNode(n->child->brother);
-  if (isCondOperator(n))
+  printf("isCond:%d\n", isCondOperator(n));
+  if (isCondOperator(n) == TRUE)
   {
     fprintf(fp,"# s left expression\n");
     printf("# s left expression\n");
-    if (isIdentNumber(n->child))
+    if (isIdentNumber(n->child) == TRUE)
     {
       genCodeNumberOrIdent(n->child, "t1", fp);
     }
@@ -502,7 +504,7 @@ void condition(Node *n, FILE *fp)
 
     fprintf(fp,"# s right expression\n");
     printf("# s right expression\n");
-    if(isIdentNumber(n->child->brother))
+    if(isIdentNumber(n->child->brother) == TRUE)
     {
       genCodeNumberOrIdent(n->child->brother, "t3", fp);
     }
@@ -605,64 +607,67 @@ void elsestmt(Node *n, FILE *fp)
 }
 
 char *typeChar[] = {
-    "IDENT_AST",
-    "IDENTS_AST",
-    "NUMBER_AST",
-    "COND_AST",
-    "GLT_AST",
-    "LTE_AST",
-    "LT_AST",
-    "GT_AST",
-    "EQ_AST",
-    "ADD_AST",
-    "DIV_AST",
-    "MUL_AST",
-    "SUB_AST",
-    "DECRE_AST",
-    "INCRE_AST",
-    "OP_INCRE",
-    "OP_DECRE",
-    "ASSIGNMENT_STMT_AST",
-    "ELSE_AST",
-    "IF_STMT_AST",
-    "ELIF_STMT_AST",
-    "ELSE_STMT_AST",
-    "FOR_LOOP_AST",
-    "WHILE_LOOP_AST",
-    "ARRAY_AST",
-    "DEFINE_AST",
-    "FUNCCALL_AST",
-    "FUNC_AST",
-    "PROGRAM_AST",
-    "DECLARATIONS_AST",
-    "DECL_STATEMENT_AST",
-    "STATEMENTS_AST",
-    "STATEMENT_AST",
-    "ASSIGNMENT_AST",
-    "EXPRESSION_AST",
-    "TERM_AST",
-    "FACTOR_AST",
-    "ARGUMENT_DCLLIST_AST",
-    "ARGUMENT_CALLLIST_AST",
-    "FUNCTION_DCL_AST",
-    "FUNCTION_CALL_AST",
-    "ARRAY_INDEX_AST",
-    "BREAK_AST",
-    "CREMENT_AST",
-    "VAR_AST",
-    "LOOP_STMT_AST",
-    "COND_STMT_AST",
-    "DEFINE_ARRAY_AST",
-    "OP_EQ",
-    "OP_LT",
-    "OP_GT",
-    "OP_LTE",
-    "OP_GLT",
-    "OP_MUL",
-    "OP_ADD",
-    "OP_SUB",
-    "OP_DIV",
-    "IF_AST",
+  "IDENT_AST",
+  "IDENTS_AST",
+  "NUMBER_AST",
+  "COND_AST",
+  "GLT_AST",
+  "LTE_AST",
+  "LT_AST",
+  "GT_AST",
+  "EQ_AST",
+  "ADD_AST",
+  "DIV_AST",
+  "MUL_AST",
+  "SUB_AST",
+  "SUR_AST",
+  "DECRE_AST",
+  "INCRE_AST",
+  "OP_INCRE",
+  "OP_DECRE",
+  "ASSIGNMENT_STMT_AST",
+  "ELSE_AST",
+  "IF_STMT_AST",
+  "ELIF_STMT_AST",
+  "ELSE_STMT_AST",
+  "FOR_LOOP_AST",
+  "WHILE_LOOP_AST",
+  "ARRAY_AST",
+  "DEFINE_AST",
+  "FUNCCALL_AST",
+  "FUNC_AST",
+  "PROGRAM_AST",
+  "DECLARATIONS_AST",
+  "DECL_STATEMENT_AST",
+  "STATEMENTS_AST",
+  "STATEMENT_AST",
+  "ASSIGNMENT_AST",
+  "EXPRESSION_AST",
+  "TERM_AST",
+  "FACTOR_AST",
+  "ARGUMENT_DCLLIST_AST",
+  "ARGUMENT_CALLLIST_AST",
+  "FUNCTION_DCL_AST",
+  "FUNCTION_CALL_AST",
+  "ARRAY_INDEX_AST",
+  "BREAK_AST",
+  "CREMENT_AST",
+  "VAR_AST",
+  "LOOP_STMT_AST",
+  "COND_STMT_AST",
+  "DEFINE_ARRAY_AST",
+  "ARGUMENT_DCL_AST",
+  "OP_EQ",
+  "OP_LT",
+  "OP_GT",
+  "OP_LTE",
+  "OP_GLT",
+  "OP_MUL",
+  "OP_ADD",
+  "OP_SUB",
+  "OP_DIV",
+  "IF_AST",
+  "OP_SUR",
 };
 
 void printVars(int length)
