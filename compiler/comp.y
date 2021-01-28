@@ -16,7 +16,7 @@ extern int yyerror();
 %token L_BRACKET R_BRACKET L_PARAN R_PARAN L_BRACE R_BRACE
 %token ASSIGN 
 %token <sp>IDENT
-%token BREAK ADD SUB MUL DIV EQ LT GT LTE GLT INCRE DECRE
+%token BREAK ADD SUB MUL DIV EQ LT GT LTE GLT INCRE DECRE SUR
 %token <ival>NUMBER
 %token FUNC COMMA FUNCCALL
 %type <np> program declarations idents argument_calllist argument_dcllist function_call function_dcl argument_dcl
@@ -86,9 +86,13 @@ term : term mul_op factor
         {
             $$ = build_node2(MUL_AST, $1, $3); 
         }
-        else
+        else if($2 == OP_DIV)
         {
             $$ = build_node2(DIV_AST, $1, $3); 
+        }
+        else
+        {
+            $$ = build_node2(SUR_AST, $1, $3);
         }
     }
 | factor
@@ -101,6 +105,7 @@ add_op : ADD { $$ = OP_ADD; }
 ;
 mul_op : MUL { $$ = OP_MUL; }
 | DIV { $$ = OP_DIV; }
+| SUR { $$ = OP_SUR; }
 ;
 crement : INCRE { $$ = OP_INCRE; }
 | DECRE { $$ = OP_DECRE; }

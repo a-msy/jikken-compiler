@@ -16,6 +16,7 @@ typedef enum{
   DIV_AST,
   MUL_AST,
   SUB_AST,
+  SUR_AST,
   DECRE_AST,
   INCRE_AST,
   OP_INCRE,
@@ -62,6 +63,7 @@ typedef enum{
   OP_SUB,
   OP_DIV,
   IF_AST,
+  OP_SUR,
 } NType;
 
 typedef struct node{

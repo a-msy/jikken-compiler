@@ -29,6 +29,7 @@
 "-" return SUB;
 "*" return MUL;
 "/" return DIV;
+"%" return SUR;
 "==" return EQ;
 "<" return LT;
 ">" return GT;

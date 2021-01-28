@@ -1,13 +1,11 @@
 # How to Use :: make all N=num
 run: 
-	flex comp.l
-	bison -d comp.y
-	gcc comp.tab.c lex.yy.c ast.c -o comp.out -DYYERROR_VERBOSE -lfl -ly
+	make compile
 	./comp.out kadai${N} < kadai${N}
 
 compile:
 	flex -d comp.l
-	bison comp.y
+	bison -d comp.y
 	gcc comp.tab.c lex.yy.c ast.c -o comp.out -DYYERROR_VERBOSE -lfl -ly
 
 test:
@@ -18,6 +16,7 @@ test:
 	maps -e -q kadai1.s
 	maps -e -q kadai2.s
 	maps -e -q kadai3.s
+
 check:
 	make compile
 	./comp.out test < test.txt
@@ -25,7 +24,7 @@ check:
 	
 rung:
 	flex -d comp.l
-	bison comp.y
+	bison -d comp.y
 	gcc comp.tab.c lex.yy.c ast.c -o comp.out -DYYERROR_VERBOSE -lfl -ly -g
 	./comp.out kadai${N} < kadai${N}
 

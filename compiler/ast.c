@@ -294,7 +294,7 @@ int isOperator(Node *n)
   {
     return FALSE;
   }
-  else if(n->type == ADD_AST || n->type == SUB_AST || n->type == MUL_AST || n->type == DIV_AST)
+  else if(n->type == ADD_AST || n->type == SUB_AST || n->type == MUL_AST || n->type == DIV_AST || n->type == SUR_AST)
   {
     return TRUE;
   }
@@ -407,6 +407,11 @@ void OP(Node *n, FILE *fp, int left, int right, int result)
   {
     fprintf(fp, "    div $t1, $t3\n");
     fprintf(fp, "    mflo $v0\n");
+  }
+  else if(n->type == SUR_AST)
+  {
+    fprintf(fp, "    div $t1, $t3\n");
+    fprintf(fp, "    mfhi $v0\n");
   }
   fprintf(fp, "#after operator\n    sw $v0, %d($sp)\n    nop\n", result);
   heap = result;
