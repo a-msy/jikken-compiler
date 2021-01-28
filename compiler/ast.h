@@ -103,7 +103,7 @@ void expression(Node *n, FILE *fp);
 int isOperator(Node *n);
 int isIdentNumber(Node *n);
 int isOperator(Node *n);
-void OP(Node *n, FILE *fp);
+void OP(Node *n, FILE *fp, int left, int right, int result);
 void condition(Node *n, FILE *fp);
 void branch(Node *n, FILE *fp, char *jump);
 void ifstmt(Node *n, FILE *fp);

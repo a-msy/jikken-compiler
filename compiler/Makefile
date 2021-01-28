@@ -18,7 +18,11 @@ test:
 	maps -e -q kadai1.s
 	maps -e -q kadai2.s
 	maps -e -q kadai3.s
-
+check:
+	make compile
+	./comp.out test < test.txt
+	maps -e -q test.s
+	
 rung:
 	flex -d comp.l
 	bison comp.y

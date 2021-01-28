@@ -331,7 +331,7 @@ int expressionSubHeap(Node *n, FILE *fp, char *t, int heap_addr){
   else if(isIdentNumber(n) == TRUE)
   {
     genCodeNumberOrIdent(n, t, fp);
-    fprintf(fp, "    sw $%s %d($t0)\n", t, offset + h);
+    fprintf(fp, "    sw $%s %d($sp)\n    nop\n", t, h);
   }
   else
   {
@@ -343,31 +343,23 @@ int expressionSubHeap(Node *n, FILE *fp, char *t, int heap_addr){
 void expressionSub(Node *n, FILE *fp){
   if(isOperator(n) == TRUE){
     int result = heap;
-    heap += MEMORY;
-
     // left
+    heap += MEMORY;
     int leftHeap = expressionSubHeap(n->child, fp, "t1", heap);
-    heap += MEMORY;
     // left
 
     // right
-    int rightHeap = expressionSubHeap(n->child->brother, fp, "t3", heap);
     heap += MEMORY;
+    int rightHeap = expressionSubHeap(n->child->brother, fp, "t3", heap);
     // right
 
-    // store
-    fprintf(fp, "    lw $t1, %d($t0)\n    nop\n", offset + leftHeap);
-    fprintf(fp, "    lw $t3, %d($t0)\n    nop\n", offset + rightHeap);
-
-    OP(n, fp);
-
-    fprintf(fp, "#after operator\n    sw $v0, %d($t0)\n    nop\n", offset + result);
+    OP(n, fp, leftHeap, rightHeap, result);
   }
   else
   {
-    if(n->child != NULL)
+    if (n->child != NULL)
     {
-      expressionSub(n->child, fp);
+      expression(n->child, fp);
     }
   }
 }
@@ -381,7 +373,7 @@ void expression(Node *n, FILE *fp)
   if (isOperator(n) == TRUE)
   {
     expressionSub(n, fp);
-    heap = MEMORY;
+    heap = 0;
   }
   else if (isIdentNumber(n) == TRUE)
   {
@@ -392,6 +384,33 @@ void expression(Node *n, FILE *fp)
     expression(n->child, fp);
   }
   return ;
+}
+
+void OP(Node *n, FILE *fp, int left, int right, int result)
+{
+  fprintf(fp, "    lw $t1, %d($sp)\n    nop\n", left);
+  fprintf(fp, "    lw $t3, %d($sp)\n    nop\n", right);
+  if (n->type == ADD_AST)
+  {
+    fprintf(fp, "    add $v0, $t1, $t3\n");
+  }
+  else if (n->type == SUB_AST)
+  {
+    fprintf(fp, "    sub $v0, $t1, $t3\n");
+  }
+  else if (n->type == MUL_AST)
+  {
+    fprintf(fp, "    mult $t1, $t3\n");
+    fprintf(fp, "    mflo $v0\n");
+  }
+  else if (n->type == DIV_AST)
+  {
+    fprintf(fp, "    div $t1, $t3\n");
+    fprintf(fp, "    mflo $v0\n");
+  }
+  fprintf(fp, "#after operator\n    sw $v0, %d($sp)\n    nop\n", result);
+  heap = result;
+  return;
 }
 
 void genCodeNumberOrIdent(Node *n, char *reg, FILE *fp)
@@ -435,28 +454,6 @@ void assignment(Node *n, FILE *fp)
   return ;
 }
 
-void OP(Node *n, FILE *fp)
-{
-  if (n->type == ADD_AST)
-  {
-    fprintf(fp, "    add $v0, $t1, $t3\n");
-  }
-  else if (n->type == SUB_AST)
-  {
-    fprintf(fp, "    sub $v0, $t1, $t3\n");
-  }
-  else if (n->type == MUL_AST)
-  {
-    fprintf(fp, "    mult $t1, $t3\n");
-    fprintf(fp, "    mflo $v0\n");
-  }
-  else if (n->type == DIV_AST)
-  {
-    fprintf(fp, "    div $t1, $t3\n");
-    fprintf(fp, "    mflo $v0\n");
-  }
-  return ;
-}
 
 int isCondOperator(Node *n)
 {
