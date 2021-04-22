@@ -1,3 +1,6 @@
+About
+岡山大学　工学部　情報系　３回生　４学期　コンパイラ　実験
+
 # jikken-compiler
 There is a viewing fee for this repository. Donate a pizza to me.
 
